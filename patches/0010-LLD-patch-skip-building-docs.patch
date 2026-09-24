@@ -1,0 +1,25 @@
+From b56d0834728e6c02f833c3e0a281ac4807be7ce3 Mon Sep 17 00:00:00 2001
+From: Andrew Kelley <andrew@ziglang.org>
+Date: Fri, 31 Dec 2021 14:41:37 -0700
+Subject: [PATCH 10/11] LLD patch: skip building docs
+
+This allows us to delete the lld/docs directory from zig-bootstrap.
+---
+ lld/CMakeLists.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/lld/CMakeLists.txt b/lld/CMakeLists.txt
+index 0fffb5d4..57d07c0d 100644
+--- a/lld/CMakeLists.txt
++++ b/lld/CMakeLists.txt
+@@ -210,7 +210,6 @@ if (LLVM_INCLUDE_TESTS)
+   add_subdirectory(test)
+ endif()
+ 
+-add_subdirectory(docs)
+ add_subdirectory(COFF)
+ add_subdirectory(ELF)
+ add_subdirectory(MachO)
+-- 
+2.43.0
+

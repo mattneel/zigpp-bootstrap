@@ -1,0 +1,44 @@
+From 037002227c02ca68c294eac78b5438850bb593a2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alex=20R=C3=B8nne=20Petersen?= <alex@alexrp.com>
+Date: Wed, 7 Jan 2026 03:43:07 +0100
+Subject: [PATCH 03/11] llvm patch: OpenBSD llvm-config logic
+
+https://codeberg.org/OpenBSD/ports/src/commit/46fde2c7b49ea8cad31a075488ce8bc25b737afb/devel/llvm/21/patches/patch-llvm_tools_llvm-config_llvm-config_cpp
+---
+ llvm/tools/llvm-config/llvm-config.cpp | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/llvm/tools/llvm-config/llvm-config.cpp b/llvm/tools/llvm-config/llvm-config.cpp
+index 76aa9f82..eb674ee9 100644
+--- a/llvm/tools/llvm-config/llvm-config.cpp
++++ b/llvm/tools/llvm-config/llvm-config.cpp
+@@ -414,6 +414,12 @@ int main(int argc, char **argv) {
+     StaticExt = "a";
+     StaticDir = SharedDir = ActiveLibDir;
+     StaticPrefix = SharedPrefix = "lib";
++  } else if (HostTriple.isOSOpenBSD()) {
++    SharedExt = "so";
++    SharedVersionedExt = ".so" ;
++    StaticExt = "a";
++    StaticDir = SharedDir = ActiveLibDir;
++    StaticPrefix = SharedPrefix = "lib";
+   } else {
+     // default to the unix values:
+     SharedExt = "so";
+@@ -441,7 +447,12 @@ int main(int argc, char **argv) {
+     std::string path((SharedDir + DirSep + DyLibName).str());
+     if (DirSep == "\\")
+       llvm::replace(path, '/', '\\');
+-    DyLibExists = sys::fs::exists(path);
++    // path does not include major.minor
++    if (HostTriple.isOSOpenBSD()) {
++      DyLibExists = true;
++    } else {
++      DyLibExists = sys::fs::exists(path);
++    }
+     if (!DyLibExists) {
+       // The shared library does not exist: don't error unless the user
+       // explicitly passes --link-shared.
+-- 
+2.43.0
+

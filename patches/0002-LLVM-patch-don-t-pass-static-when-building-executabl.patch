@@ -1,0 +1,29 @@
+From 161c0bfe44178047735046f15f9cffc1fcf4e5ec Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alex=20R=C3=B8nne=20Petersen?= <alex@alexrp.com>
+Date: Thu, 1 May 2025 20:59:22 +0200
+Subject: [PATCH 02/11] LLVM patch: don't pass -static when building
+ executables
+
+This is problematic when targeting *-linux-gnu* and *-macos-none because Zig
+doesn't provide a static libc for these, resulting in early configure errors.
+Just rely on the Zig compiler to infer the executable link mode from the link
+inputs instead.
+---
+ llvm/CMakeLists.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/llvm/CMakeLists.txt b/llvm/CMakeLists.txt
+index 7b8f1b3b..79662240 100644
+--- a/llvm/CMakeLists.txt
++++ b/llvm/CMakeLists.txt
+@@ -1044,7 +1044,6 @@ if(NOT LLVM_INDIVIDUAL_TEST_COVERAGE)
+ endif()
+ 
+ if (LLVM_BUILD_STATIC)
+-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+   # Remove shared library suffixes from use in find_library
+   foreach (shared_lib_suffix ${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_IMPORT_LIBRARY_SUFFIX})
+     list(FIND CMAKE_FIND_LIBRARY_SUFFIXES ${shared_lib_suffix} shared_lib_suffix_idx)
+-- 
+2.43.0
+

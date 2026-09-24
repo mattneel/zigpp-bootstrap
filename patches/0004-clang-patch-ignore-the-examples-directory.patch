@@ -1,0 +1,26 @@
+From 3ccbd7092d7afaec4cc9cdfe4024199266a753e8 Mon Sep 17 00:00:00 2001
+From: Andrew Kelley <andrew@ziglang.org>
+Date: Sat, 28 Jan 2023 19:38:13 -0700
+Subject: [PATCH 04/11] clang patch: ignore the examples directory
+
+---
+ clang/CMakeLists.txt | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/clang/CMakeLists.txt b/clang/CMakeLists.txt
+index 89f584c5..92cf62c9 100644
+--- a/clang/CMakeLists.txt
++++ b/clang/CMakeLists.txt
+@@ -563,9 +563,6 @@ option(CLANG_BUILD_EXAMPLES "Build CLANG example programs by default." OFF)
+ option(CLANG_INCLUDE_EXAMPLES
+        "Generate build targets for the Clang examples."
+        ${LLVM_INCLUDE_EXAMPLES})
+-if (CLANG_INCLUDE_EXAMPLES)
+-  add_subdirectory(examples)
+-endif()
+ 
+ if(APPLE)
+   # this line is needed as a cleanup to ensure that any CMakeCaches with the old
+-- 
+2.43.0
+

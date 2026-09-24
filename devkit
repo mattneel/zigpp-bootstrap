@@ -1,0 +1,53 @@
+#!/bin/sh
+# This file is licensed under the public domain.
+#
+# Packs what ./build made for a target into a devkit, the kind of archive that
+# upstream Zig's CI downloads from ziglang.org/deps:
+#
+#   out/devkit/zig+llvm+lld+clang-<target>-<version>.tar.xz (.zip for Windows)
+#
+# It holds the static LLVM, Clang, LLD, zlib, and zstd libraries for the
+# target and their headers, with the Zig++ built for the target in bin/ and
+# its lib/ in lib/zig/. Building Zig++ for the target needs nothing else:
+# `zig build -Dtarget=<target> -Dstatic-llvm --search-prefix <devkit>`.
+#
+#   ./devkit <arch>-<os>-<abi> <mcpu>
+
+set -eu
+
+TARGET="$1"
+MCPU="$2"
+
+ROOTDIR="$(pwd)"
+ZIG_VERSION="${ZIG_VERSION:-$(cat "$ROOTDIR/zig-version")}"
+NAME="zig+llvm+lld+clang-$TARGET-$ZIG_VERSION"
+PREFIX="$ROOTDIR/out/$TARGET-$MCPU"
+ZIG_DIST="$ROOTDIR/out/zig-$TARGET-$MCPU"
+STAGE="$ROOTDIR/out/devkit/$NAME"
+
+case $TARGET in
+  *-windows-*) EXE=".exe";;
+  *) EXE="";;
+esac
+
+rm -rf "$STAGE"
+mkdir -p "$STAGE"
+cp -R "$PREFIX/." "$STAGE/"
+mkdir -p "$STAGE/bin"
+cp "$ZIG_DIST/zig$EXE" "$STAGE/bin/zig$EXE"
+rm -rf "$STAGE/lib/zig"
+cp -R "$ZIG_DIST/lib" "$STAGE/lib/zig"
+
+cd "$ROOTDIR/out/devkit"
+case $TARGET in
+  *-windows-*)
+    rm -f "$NAME.zip"
+    zip -qr "$NAME.zip" "$NAME"
+    ;;
+  *)
+    rm -f "$NAME.tar.xz"
+    XZ_OPT="-T0" tar -cJf "$NAME.tar.xz" "$NAME"
+    ;;
+esac
+rm -rf "$STAGE"
+ls -l "$ROOTDIR/out/devkit"

@@ -1,0 +1,26 @@
+From 2214ed345190aca4186f09eb855379ca1c0de3fc Mon Sep 17 00:00:00 2001
+From: Andrew Kelley <andrew@ziglang.org>
+Date: Tue, 25 Oct 2022 17:05:37 -0700
+Subject: [PATCH 01/11] LLVM patch: support .lib extension for static zstd
+
+---
+ llvm/cmake/modules/Findzstd.cmake | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/llvm/cmake/modules/Findzstd.cmake b/llvm/cmake/modules/Findzstd.cmake
+index dbfaadb5..64a9efa3 100644
+--- a/llvm/cmake/modules/Findzstd.cmake
++++ b/llvm/cmake/modules/Findzstd.cmake
+@@ -12,6 +12,9 @@
+ 
+ if(MSVC OR "${CMAKE_CXX_SIMULATE_ID}" STREQUAL "MSVC")
+   set(zstd_STATIC_LIBRARY_SUFFIX "_static\\${CMAKE_STATIC_LIBRARY_SUFFIX}$")
++elseif(WIN32)
++  set(zstd_SHARED_LIBRARY_SUFFIX "\\${CMAKE_SHARED_LIBRARY_SUFFIX}$")
++  set(zstd_STATIC_LIBRARY_SUFFIX ".lib")
+ else()
+   set(zstd_STATIC_LIBRARY_SUFFIX "\\${CMAKE_STATIC_LIBRARY_SUFFIX}$")
+ endif()
+-- 
+2.43.0
+

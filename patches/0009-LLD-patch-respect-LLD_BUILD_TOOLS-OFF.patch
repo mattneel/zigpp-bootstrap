@@ -1,0 +1,29 @@
+From dd3be7d4a4fab6d70ffe91ef4fe3adf2165d44f9 Mon Sep 17 00:00:00 2001
+From: Andrew Kelley <andrew@ziglang.org>
+Date: Fri, 21 Jul 2023 11:04:58 -0700
+Subject: [PATCH 09/11] LLD patch: respect LLD_BUILD_TOOLS=OFF
+
+Without this, cmake will build and install LLD binaries, which are
+unwanted, and also cause RPATH failures on some targets.
+---
+ lld/CMakeLists.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/lld/CMakeLists.txt b/lld/CMakeLists.txt
+index e167f598..0fffb5d4 100644
+--- a/lld/CMakeLists.txt
++++ b/lld/CMakeLists.txt
+@@ -197,7 +197,9 @@ include_directories(BEFORE
+   )
+ 
+ add_subdirectory(Common)
+-add_subdirectory(tools/lld)
++if(LLD_BUILD_TOOLS)
++  add_subdirectory(tools/lld)
++endif()
+ 
+ if (LLVM_INCLUDE_TESTS)
+   add_custom_target(LLDUnitTests)
+-- 
+2.43.0
+

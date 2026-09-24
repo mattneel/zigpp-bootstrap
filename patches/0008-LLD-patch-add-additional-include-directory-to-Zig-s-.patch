@@ -1,0 +1,25 @@
+From 13aef4c71710867926c65d0ae719c8ea19910949 Mon Sep 17 00:00:00 2001
+From: Andrew Kelley <andrew@ziglang.org>
+Date: Fri, 28 May 2021 20:19:46 -0700
+Subject: [PATCH 08/11] LLD patch: add additional include directory to Zig's
+ libunwind
+
+---
+ lld/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lld/CMakeLists.txt b/lld/CMakeLists.txt
+index b4b06caf..e167f598 100644
+--- a/lld/CMakeLists.txt
++++ b/lld/CMakeLists.txt
+@@ -193,6 +193,7 @@ endif()
+ include_directories(BEFORE
+   ${CMAKE_CURRENT_BINARY_DIR}/include
+   ${CMAKE_CURRENT_SOURCE_DIR}/include
++  ${CMAKE_CURRENT_SOURCE_DIR}/../zig/lib/libunwind/include
+   )
+ 
+ add_subdirectory(Common)
+-- 
+2.43.0
+
