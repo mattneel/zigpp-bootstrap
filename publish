@@ -1,0 +1,38 @@
+#!/bin/sh
+# This file is licensed under the public domain.
+#
+# Publishes the devkits in out/devkit for the version in zig-version as the
+# GitHub release devkit-<version> of this repository, with their SHA-256 sums,
+# which is where Zig++'s CI downloads them from. Needs an authenticated gh.
+#
+#   ./publish
+#
+# The release is created as a draft and published once every archive is
+# uploaded, so CI never sees a release with some devkits missing.
+
+set -eu
+
+ROOTDIR="$(pwd)"
+ZIG_VERSION="${ZIG_VERSION:-$(cat "$ROOTDIR/zig-version")}"
+TAG="devkit-$ZIG_VERSION"
+LLVM_VERSION="$(sed -n 's/^LLVM_VERSION="\(.*\)"$/\1/p' "$ROOTDIR/build")"
+
+cd "$ROOTDIR/out/devkit"
+set -- zig+llvm+lld+clang-*-"$ZIG_VERSION".tar.xz zig+llvm+lld+clang-*-"$ZIG_VERSION".zip
+ARCHIVES=""
+for archive in "$@"; do
+  [ -f "$archive" ] && ARCHIVES="$ARCHIVES $archive"
+done
+[ -n "$ARCHIVES" ] || { echo "no devkits of $ZIG_VERSION in out/devkit" >&2; exit 1; }
+
+# shellcheck disable=SC2086
+sha256sum $ARCHIVES > SHA256SUMS
+cat SHA256SUMS
+
+# shellcheck disable=SC2086
+gh release create "$TAG" $ARCHIVES SHA256SUMS \
+  --draft \
+  --target "$(git -C "$ROOTDIR" rev-parse HEAD)" \
+  --title "Devkits for Zig++ $ZIG_VERSION" \
+  --notes "Static LLVM, Clang, and LLD $LLVM_VERSION libraries and headers for each target, with the Zig++ $ZIG_VERSION that built them, made by \`./build <target> baseline\` and \`./devkit <target> baseline\` at $(git -C "$ROOTDIR" rev-parse --short HEAD)."
+gh release edit "$TAG" --draft=false

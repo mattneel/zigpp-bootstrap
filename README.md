@@ -73,7 +73,15 @@ for other targets reuse the host build.
 
 packs the target's libraries, headers, and Zig++ into
 `out/devkit/zig+llvm+lld+clang-<arch>-<os>-<abi>-<version>.tar.xz` (a `.zip` for
-Windows). Zig++'s CI downloads these from the releases of this repository.
+Windows). Zig++'s CI downloads these from the releases of this repository:
+
+```
+./publish
+```
+
+uploads every devkit of the version in `zig-version` from `out/devkit`, with a
+`SHA256SUMS` file, as the release `devkit-<version>`. Zig++'s
+`.github/scripts/devkit.sh` names the version that CI uses.
 
 ## Updating
 
