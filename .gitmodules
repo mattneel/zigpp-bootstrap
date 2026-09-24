@@ -1,0 +1,5 @@
+[submodule "zig"]
+	path = zig
+	url = https://github.com/mattneel/zigpp.git
+	shallow = true
+	branch = llvm23
